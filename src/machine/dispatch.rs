@@ -4709,6 +4709,14 @@ impl Machine {
                         try_or_throw!(self.machine_st, self.add_dynamic_predicate());
                         self.machine_st.p = self.machine_st.cp;
                     }
+                    &Instruction::CallAddMetaPredicateRecord => {
+                        try_or_throw!(self.machine_st, self.add_meta_predicate_record());
+                        self.machine_st.p += 1;
+                    }
+                    &Instruction::ExecuteAddMetaPredicateRecord => {
+                        try_or_throw!(self.machine_st, self.add_meta_predicate_record());
+                        self.machine_st.p = self.machine_st.cp;
+                    }
                     &Instruction::CallAddMultifilePredicate => {
                         try_or_throw!(self.machine_st, self.add_multifile_predicate());
                         self.machine_st.p += 1;

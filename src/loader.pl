@@ -243,14 +243,25 @@ complete_partial_goal(N, HeadArg, InnerHeadArgs, SuppArgs, CompleteHeadArg) :-
     ;  type_error(callable, Functor, _)
     ).
 
+w(Marker, Goal) :-
+%   write(Marker:call:Goal),nl,
+    call(loader:Goal),
+    write(Marker:exit:Goal),nl,
+    true.
+
 inner_meta_specs(0, HeadArg, InnerHeadArgs, InnerMetaSpecs) :-
     !,
+%   write(1:inner_meta_specs),nl,
     predicate_property(HeadArg, meta_predicate(InnerMetaSpecs0)),
     InnerMetaSpecs0 =.. [_ | InnerMetaSpecs],
     HeadArg =.. [_ | InnerHeadArgs].
 inner_meta_specs((:), _, [], []) :-
-    !.
+    !,
+%   write(2:inner_meta_specs),nl.
+    true.
 inner_meta_specs(N, HeadArg, InnerHeadArgs, InnerMetaSpecs) :-
+    !,
+%   write(3:inner_meta_specs),nl,
     complete_partial_goal(N, HeadArg, InnerHeadArgs, _, CompleteHeadArg),
     predicate_property(CompleteHeadArg, meta_predicate(InnerMetaSpecs0)),
     InnerMetaSpecs0 =.. [_ | InnerMetaSpecs].
@@ -265,7 +276,7 @@ module_expanded_head_variables_([HeadArg | HeadArgs], [MetaSpec | MetaSpecs], He
        (  var(HeadArg) ->
           HeadVars = [HeadArg-MetaSpec | HeadVars1],
           module_expanded_head_variables_(HeadArgs, MetaSpecs, HeadVars1, HeadVars0)
-       ;  inner_meta_specs(MetaSpec, HeadArg, InnerHeadArgs, InnerMetaSpecs) ->
+       ;  w(1, inner_meta_specs(MetaSpec, HeadArg, InnerHeadArgs, InnerMetaSpecs)) ->
           module_expanded_head_variables_(InnerHeadArgs, InnerMetaSpecs, HeadVars, HeadVars1),
           module_expanded_head_variables_(HeadArgs, MetaSpecs, HeadVars1, HeadVars0)
        ;  module_expanded_head_variables_(HeadArgs, MetaSpecs, HeadVars, HeadVars0)
@@ -426,6 +437,24 @@ add_predicate_declaration(Handler, (PI, PIs)) :-
        add_predicate_declaration(Handler, PIs)
     ;  throw(error(type_error(predicate_indicator_sequence, (PI, PIs)), load/1))
     ).
+add_meta_predicate_declaration(Handler, MPI) :-
+    functor(MPI, Pred, Arity), Pred \= '.',
+    predicate_indicator(Pred/Arity),
+    prolog_load_context(module, Module),
+    call(Handler, Module, MPI).
+add_meta_predicate_declaration(Handler, [MPI|MPIs]) :-
+    '$skip_max_list'(_, _, MPIs, T),
+    (  T == [],
+       maplist(loader:add_mp_aux, [MPI|MPIs], PIs),
+       maplist(loader:predicate_indicator, PIs) ->
+       maplist(loader:add_meta_predicate_declaration(Handler), [MPI|MPIs])
+    ;  throw(error(type_error(meta_predicate_indicator_list, [MPI|MPIs]), load/1))
+    ).
+add_meta_predicate_declaration(Handler, (MPI,MPIs)) :-
+    throw(error(not_implemented(add_meta_predicate_declaration(Handler, (MPI,MPIs))),_)).
+
+add_mp_aux(MPI, Name/Arity) :-
+    functor(MPI, Name, Arity).
 
 add_dynamic_predicate(Evacuable, Module, Name, Arity) :-
     '$add_dynamic_predicate'(Module, Name, Arity, Evacuable).
@@ -435,6 +464,10 @@ add_multifile_predicate(Evacuable, Module, Name, Arity) :-
 
 add_discontiguous_predicate(Evacuable, Module, Name, Arity) :-
     '$add_discontiguous_predicate'(Module, Name, Arity, Evacuable).
+
+add_meta_predicate_record(Evacuable, Module, MPI) :-
+    write('@':Module:MPI),nl,
+    '$add_meta_predicate_record'(Module, MPI, Evacuable).
 
 compile_declaration(use_module(Module), Evacuable) :-
     use_module(Module, [], Evacuable).
@@ -454,6 +487,8 @@ compile_declaration(multifile(PIs), Evacuable) :-
     add_predicate_declaration(loader:add_multifile_predicate(Evacuable), PIs).
 compile_declaration(discontiguous(PIs), Evacuable) :-
     add_predicate_declaration(loader:add_discontiguous_predicate(Evacuable), PIs).
+compile_declaration(meta_predicate(MPIs), Evacuable) :-
+    add_meta_predicate_declaration(loader:add_meta_predicate_record(Evacuable), MPIs).
 compile_declaration(initialization(Goal), Evacuable) :-
     prolog_load_context(module, Module),
     assertz(Module:'$initialization_goals'(Goal)).
@@ -749,7 +784,7 @@ expand_subgoal(UnexpandedGoals, MS, M, ExpandedGoals, HeadVars, TGs) :-
        )
     ),
     strip_subst_module(UnexpandedGoals3, Module, Module1, UnexpandedGoals4),
-    (  inner_meta_specs(0, UnexpandedGoals4, _, MetaSpecs) ->
+    (  w(2, inner_meta_specs(0, UnexpandedGoals4, _, MetaSpecs)) ->
        expand_module_names(UnexpandedGoals4, MetaSpecs, Module1, ExpandedGoals0, HeadVars, TGs)
     ;  ExpandedGoals0 = UnexpandedGoals4
     ),

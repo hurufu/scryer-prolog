@@ -9,6 +9,9 @@ use crate::parser::ast::*;
 
 use indexmap::IndexSet;
 
+use std::backtrace::Backtrace;
+
+
 use std::cell::Cell;
 use std::convert::TryFrom;
 
@@ -306,14 +309,18 @@ pub(super) fn setup_declaration<'a, LS: LoadState<'a>>(
         Term::Clause(_, name, mut terms) => match (name, terms.len()) {
             (atom!("dynamic"), 1) => {
                 let (name, arity) = setup_predicate_indicator(&mut terms.pop().unwrap())?;
+                dbg!("Hi dynamic/1", name, arity);
+                println!("{:?}", Backtrace::capture());
                 Ok(Declaration::Dynamic(name, arity))
             }
             (atom!("module"), 2) => {
                 let atom_tbl = &mut LS::machine_st(&mut loader.payload).atom_tbl;
+                //dbg!("Hi module/2");
                 Ok(Declaration::Module(setup_module_decl(terms, atom_tbl)?))
             }
             (atom!("op"), 3) => {
                 let atom_tbl = &mut LS::machine_st(&mut loader.payload).atom_tbl;
+                //dbg!("Hi op/3");
                 Ok(Declaration::Op(setup_op_decl(terms, atom_tbl)?))
             }
             (atom!("non_counted_backtracking"), 1) => {
@@ -322,13 +329,17 @@ pub(super) fn setup_declaration<'a, LS: LoadState<'a>>(
             }
             (atom!("use_module"), 1) => Ok(Declaration::UseModule(setup_use_module_decl(terms)?)),
             (atom!("use_module"), 2) => {
+                //dbg!("Hi use_module/2");
                 let atom_tbl = &mut LS::machine_st(&mut loader.payload).atom_tbl;
                 let (name, exports) = setup_qualified_import(terms, atom_tbl)?;
 
                 Ok(Declaration::UseQualifiedModule(name, exports))
             }
+            // Found
             (atom!("meta_predicate"), 1) => {
                 let (module_name, name, meta_specs) = setup_meta_predicate(terms, loader)?;
+                println!("Hi meta_predicate/1");
+                //dbg!(module_name, name);
                 Ok(Declaration::MetaPredicate(module_name, name, meta_specs))
             }
             _ => Err(CompilationError::InconsistentEntry),

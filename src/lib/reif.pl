@@ -15,8 +15,22 @@ Example:
 		         memberd_t/3, tfilter/3, tmember/2, tmember_t/3,
 		         tpartition/4]).
 
+:- dynamic([dupa/2]).
+
+%:- meta_predicate([
+%    if_(1, 0, 0),
+%    cond_t(1, 0, ?),
+%    tfilter(2, ?, ?),
+%    tpartition(2, ?, ?, ?),
+%    ','(1, 1, ?),
+%    ;(1, 1, ?),
+%    tmember(2, ?),
+%    tmember_t(2, ?, ?)
+%]).
+
 :- use_module(library(dif)).
 
+:- meta_predicate(if_(1, 0, 0)).
 :- meta_predicate(if_(1, 0, 0)).
 
 if_(If_1, Then_0, Else_0) :-

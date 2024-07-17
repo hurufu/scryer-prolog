@@ -1260,6 +1260,7 @@ impl<'a, LS: LoadState<'a>> Loader<'a, LS> {
         name: Atom,
         arity: usize,
     ) -> Result<(), SessionError> {
+        println!("add_dynamic_predicate 1");
         self.add_extensible_predicate_declaration(
             compilation_target,
             name,
@@ -1564,11 +1565,38 @@ impl Machine {
 
     #[inline]
     pub(crate) fn add_dynamic_predicate(&mut self) -> CallResult {
+        println!("add_dynamic_predicate 2");
         self.add_extensible_predicate_declaration(
             |loader, compilation_target, clause_name, arity| {
                 loader.add_dynamic_predicate(compilation_target, clause_name, arity)
             },
         )
+    }
+
+    #[inline]
+    pub(crate) fn add_meta_predicate_record(&mut self) -> CallResult {
+        println!("add_meta_predicate_record 2");
+        let module_name = cell_as_atom!(self.deref_register(1));
+        let reg2 = self.deref_register(2);
+        let (name, meta_specs) = read_heap_cell!(reg2,
+            (HeapCellValueTag::Atom, (name, arity)) => {
+                println!("add_meta_predicate_record 3");
+                // TODO: Iterate over term argument arity times and parse
+                // meta-predicate declaration similarly to:
+                // setup_meta_predicate(terms, loader)?;
+                (name, vec![MetaSpec::RequiresExpansionWithArgument(0), MetaSpec::RequiresExpansionWithArgument(0)])
+            }
+            _ => {
+                println!("add_meta_predicate_record 4");
+                let a: Atom = atom!("x");
+                (a, vec![])
+            }
+        );
+        let mut loader = self.loader_from_heap_evacuable(temp_v!(3));
+        println!("add_meta_predicate_record 5");
+        loader.add_meta_predicate_record(module_name, name, meta_specs);
+        println!("add_meta_predicate_record 6");
+        Ok(())
     }
 
     #[inline]
@@ -1580,6 +1608,7 @@ impl Machine {
         )
     }
 
+    // Here it is
     fn add_extensible_predicate_declaration(
         &mut self,
         decl_adder: impl for<'a> Fn(

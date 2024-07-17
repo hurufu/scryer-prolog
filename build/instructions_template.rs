@@ -142,6 +142,8 @@ enum REPLCodePtr {
     AddDiscontiguousPredicate,
     #[strum_discriminants(strum(props(Arity = "4", Name = "$add_dynamic_predicate")))]
     AddDynamicPredicate,
+    #[strum_discriminants(strum(props(Arity = "3", Name = "$add_meta_predicate_record")))]
+    AddMetaPredicateRecord,
     #[strum_discriminants(strum(props(Arity = "4", Name = "$add_multifile_predicate")))]
     AddMultifilePredicate,
     #[strum_discriminants(strum(props(Arity = "3", Name = "$add_goal_expansion_clause")))]
@@ -1878,6 +1880,7 @@ fn generate_instruction_preface() -> TokenStream {
                     &Instruction::CallDebugHook |
                     &Instruction::CallAddDiscontiguousPredicate |
                     &Instruction::CallAddDynamicPredicate |
+                    &Instruction::CallAddMetaPredicateRecord |
                     &Instruction::CallAddMultifilePredicate |
                     &Instruction::CallAddGoalExpansionClause |
                     &Instruction::CallAddTermExpansionClause |
@@ -2115,6 +2118,7 @@ fn generate_instruction_preface() -> TokenStream {
                     &Instruction::ExecuteDebugHook |
                     &Instruction::ExecuteAddDiscontiguousPredicate |
                     &Instruction::ExecuteAddDynamicPredicate |
+                    &Instruction::ExecuteAddMetaPredicateRecord |
                     &Instruction::ExecuteAddMultifilePredicate |
                     &Instruction::ExecuteAddGoalExpansionClause |
                     &Instruction::ExecuteAddTermExpansionClause |
