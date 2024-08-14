@@ -96,6 +96,23 @@ test("set of solutions found by tpartition/4 and tfilter/3 is the same and corre
     maplist(_+\(N,Ts)^maplist(=(N),Ts), S)
 )).
 
+test("cut in one of the branches does not influence condition", (
+    findall(X-Y, if_(X=1,!,Y=a), Solutions),
+    Expected = [1-Y1,X2-a],
+    subsumes_term(Expected, Solutions),
+    Solutions = Expected,
+    var(Y1),
+    var(X2), dif(X2, 1)
+)).
+
+test("non-callable branch throws meaningful error", (
+    findall(R, result_or_exception(if_(_=1, _=a, 2), R), Solutions),
+    Solutions == [if_(1=1,a=a,2), error(type_error(callable,2),call/1)]
+)).
+
+result_or_exception(Goal, Result) :-
+    catch((Goal,Result=Goal), Result, true).
+
 random_test_vector(TestVector) :-
     random_integer(0, 1000, Length),
     length(TestVector, Length),
