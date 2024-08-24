@@ -28,7 +28,8 @@ test("indexing dif/2 p7#3", (
 )).
 
 test("doesnt modify free variables", (reif:goal_expanded(A,B), A == B, var(A))).
-test("expands call/1", reif:goal_expanded(call(a), a)).
+test("doesnt expand call/1", reif:goal_expanded(call(a), call(a))).
+test("expands call(if_/3)", reif:goal_expanded(call(if_(A,B,C)), if_(A,B,C))).
 test("expands call/1 for modules", reif:goal_expanded(call(a:b(1)), a:b(1))).
 test("expands call/2 for modules", reif:goal_expanded(call(a:b,c), a:b(c))).
 test("doesn't expand call/2", reif:goal_expanded(call(b,c), call(b,c))).
@@ -54,38 +55,38 @@ TODO: Investigate if if_/3 can be further expanded, and if it will be beneficial
 */
 test("goal_expansion (=)", (
     subsumes_full_expansion(if_(1=2,a,b), (
-        1 \= 2 -> b
-    ;   1 == 2 -> a
-    ;   1 = 2, a
-    ;   dif(1,2), b)))).
+        1 \= 2 -> call(b)
+    ;   1 == 2 -> call(a)
+    ;   1 = 2, call(a)
+    ;   dif(1,2), call(b))))).
 
 test("goal_expansion (;)", (
     subsumes_full_expansion(if_((1=2;3=3),a,b), (
         1 \= 2 -> if_(3=3,a,b)
-    ;   1 == 2 -> a
-    ;   1 = 2, a
+    ;   1 == 2 -> call(a)
+    ;   1 = 2, call(a)
     ;   dif(1,2), if_(3=3,a,b))))).
 
 test("goal_expansion (,)", (
     subsumes_full_expansion(if_((1=2,3=3),a,b), (
-        1 \= 2 -> b
+        1 \= 2 -> call(b)
     ;   1 == 2 -> if_(3=3,a,b)
     ;   1 = 2, if_(3=3,a,b)
-    ;   dif(1,2), b)))).
+    ;   dif(1,2), call(b))))).
 
 test("goal_expansion memberd_t", (
     subsumes_full_expansion(if_(memberd_t(f,"abcdefgh"),t,f), (
         call(memberd_t(f,"abcdefgh"),A),
-        (   A == true  -> t
-        ;   A == false -> f
+        (   A == true  -> call(t)
+        ;   A == false -> call(f)
         ;   nonvar(A)  -> throw(error(type_error(boolean,A),_))
         ;   throw(error(instantiation_error,_))))))).
 
 test("goal_expansion cond_t", (
     subsumes_full_expansion(if_(cond_t(a,b),t,f), (
         call(cond_t(a,b),A),
-        (   A == true  -> t
-        ;   A == false -> f
+        (   A == true  -> call(t)
+        ;   A == false -> call(f)
         ;   nonvar(A)  -> throw(error(type_error(boolean,A),_))
         ;   throw(error(instantiation_error,_))))))).
 

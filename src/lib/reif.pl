@@ -66,7 +66,15 @@ goal_expanded(call(MG_1, X), MGx_0) :-
    \+ predicate_property(M:G_0, (meta_predicate _)),
    !,
    MGx_0 = M:G_0.
-goal_expanded(call(G_0), Gx_0) :-
+goal_expanded(call(if_(A,B,C)), if_(A,B,C)) :-
+   acyclic_term(if_(A,B,C)),
+   !.
+goal_expanded(call(M:G_0), M:G_0) :-
+   acyclic_term(G_0),
+   nonvar(G_0),
+   atom(M),
+   !.
+goal_expanded(call(G_0), call(Gx_0)) :-
    acyclic_term(G_0),
    nonvar(G_0),
    % more conditions
