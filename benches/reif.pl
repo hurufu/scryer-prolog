@@ -40,8 +40,8 @@ memberd_fif(X, [E|Es]) :-
 % Copy of _if/3, but with a different name, so it won't be expanded
 fif_(If_1, Then_0, Else_0) :-
     call(If_1, T),
-    (  T == true  -> call(Then_0)
-    ;  T == false -> call(Else_0)
+    (  T == true  -> Then_0
+    ;  T == false -> Else_0
     ;  nonvar(T) -> throw(error(type_error(boolean, T), _))
     ;  throw(error(instantiation_error, _))
     ).
