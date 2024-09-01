@@ -6,6 +6,6 @@ args = [
     "-g", "use_module(library(dif))",
     "-g", "use_module(library(lambda))",
     "-g", "use_module(library(lists))",
-    "-g", "reif_tests:main_quiet(reif_tests)",
+    "-g", "reif_tests:main(reif_tests)",
     "src/tests/reif.pl"
 ]

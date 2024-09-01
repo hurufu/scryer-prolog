@@ -31,4 +31,8 @@ test("cuts inside DCG do not blead to outer scope #7", (
     C=!, findall(L, (phrase(C, [_]); L=1), [1])
 )).
 
+test("cuts inside DCG do not blead to outer scope #8", (
+    findall(L, (phrase({!}, [_]); L=1), [1])
+)).
+
 foo --> !.
