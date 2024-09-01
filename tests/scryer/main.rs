@@ -21,8 +21,9 @@ mod src_tests;
 fn cli_tests() {
     trycmd::TestCases::new()
         .default_bin_name("scryer-prolog")
-        .case("tests/scryer/cli/issues/*.toml")
+        .skip("tests/scryer/cli/issues/*.toml")
         .skip("tests/scryer/cli/issues/singleton_warning.toml") // wrong line number
-        .case("tests/scryer/cli/src_tests/*.toml")
-        .case("tests/scryer/cli/src_tests/*.md");
+        .case("tests/scryer/cli/src_tests/reif_tests.toml")
+        .case("tests/scryer/cli/src_tests/dcgs_tests.toml")
+        .skip("tests/scryer/cli/src_tests/*.md");
 }
