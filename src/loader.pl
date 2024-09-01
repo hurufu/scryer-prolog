@@ -484,6 +484,9 @@ compile_clause(OrigTerm, (Target:Head :- Body), Evacuable) :-
        recompile_term(OrigTerm, (Target:Head :- Body), Evacuable)
     ).
 compile_clause(OrigTerm, Target:Head, Evacuable) :-
+    (   nonvar(Head)
+    ;   throw(error(permission_error(modify, static_procedure, (:)/2), (:)/2))
+    ),
     !,
     functor(Head, Name, Arity),
     (  '$is_consistent_with_term_queue'(Target, Name, Arity, Evacuable) ->
