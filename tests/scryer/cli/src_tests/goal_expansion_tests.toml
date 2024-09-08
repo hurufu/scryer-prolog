@@ -1,0 +1,7 @@
+args = [
+    "-f",
+    "--no-add-history",
+    "-g", "use_module(library(goal_expansion_tests))",
+    "-g", "goal_expansion_tests:main(goal_expansion_tests)",
+    "src/tests/goal_expansion/main.pl"
+]
