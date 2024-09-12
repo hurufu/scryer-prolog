@@ -23,8 +23,8 @@ fn cli_tests() {
         .default_bin_name("scryer-prolog")
         .skip("tests/scryer/cli/issues/*.toml")
         .skip("tests/scryer/cli/issues/singleton_warning.toml") // wrong line number
-        .skip("tests/scryer/cli/src_tests/reif_tests.toml")
-        .skip("tests/scryer/cli/src_tests/dcgs_tests.toml")
+        .case("tests/scryer/cli/src_tests/reif_tests.toml")
+        .case("tests/scryer/cli/src_tests/dcgs_tests.toml")
         .case("tests/scryer/cli/src_tests/goal_expansion_tests.toml")
         .skip("tests/scryer/cli/src_tests/*.md");
 }

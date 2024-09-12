@@ -4,6 +4,7 @@
 :- use_module(library(format)).
 :- use_module(library(lambda)).
 :- use_module(library(iso_ext)).
+:- use_module(library(lists)).
 :- use_module('../test_framework').
 :- use_module(m).
 
@@ -41,22 +42,26 @@ test("#2236 2", (
 )).
 
 % https://github.com/mthom/scryer-prolog/issues/2255
-test("#2255 1", (G = (_+\(user:q)), G)).
+test("#2255 1", (G = (_+\(goal_expansion_tests:q)), G)).
 test("#2255 2", (G = (_+\q), G)).
 test("#2255 3", (call(_+\q))).
 test("#2255 4", (X = (_+\q), same(X, Y), Y)).
 test("#2255 5", (
-    setup_call_cleanup(
-        asserta((t2:-X=(_+\q),X)),
-        t2,
-        retractall(t2)
+    catch(
+        setup_call_cleanup(
+            asserta((t2:-X=(_+\q),X)),
+            t2,
+            retractall(t2)
+        ),
+        E,
+        (portray_clause(E),fail)
     )
 )).
 test("#2255 6", (
     setup_call_cleanup(
         asserta((t3:-call(_+\q))),
         q,
-        retractall(t2)
+        retractall(t3)
     )
 )).
 
@@ -69,16 +74,16 @@ test("#2202 1", (
 
 % https://github.com/mthom/scryer-prolog/issues/2062
 test("#2062 1", (
-    X = 2, maplist(#\=(X), [0,1]).
+    X = 2, maplist(#\=(X), [0,1])
 )).
 test("#2062 2", (
-    maplist(#\=(X), [0,1])
+    catch(maplist(#\=(_), [0,1]), E, (portray_clause(E),fail))
 )).
 test("#2062 3", (
-    maplist(call(#\=,X), [0,1])
+    catch(maplist(call(#\=,_), [0,1]), E, (portray_clause(E),fail))
 )).
-test("#2061 4", (
-    maplist(call(#\=(X)), [0,1])
+test("#2062 4", (
+    catch(maplist(call(#\=(_)), [0,1]), E, (portray_clause(E),fail))
 )).
 
 % https://github.com/mthom/scryer-prolog/issues/1977
@@ -93,7 +98,7 @@ test("#1977 2", (
 test("#1977 3", (
     length(_, L),
     call_with_inference_limit(true, L, !)
-))
+)).
 
 % https://github.com/mthom/scryer-prolog/issues/1987
 test("#1987 1", (

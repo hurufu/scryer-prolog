@@ -2,6 +2,10 @@ args = [
     "-f",
     "--no-add-history",
     "-g", "use_module(library(goal_expansion_tests))",
+    "-g", "use_module(library(clpz))",
+    "-g", "use_module(library(format))",
+    "-g", "use_module(library(lambda))",
+    "-g", "use_module(library(iso_ext))",
     "-g", "goal_expansion_tests:main(goal_expansion_tests)",
     "src/tests/goal_expansion/main.pl"
 ]
