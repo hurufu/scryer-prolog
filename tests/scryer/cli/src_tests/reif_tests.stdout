@@ -18,8 +18,4 @@ Running test "goal_expansion memberd_t"
 Running test "goal_expansion cond_t"
 Running test "set of solutions found by tpartition/4 and tfilter/3 is the same and correct"
 Running test "cut in one of the branches does not influence condition"
-Failed test "cut in one of the branches does not influence condition"
 Running test "non-callable branch throws meaningful error"
-
-Failed tests:
-"cut in one of the branches does not influence condition"
