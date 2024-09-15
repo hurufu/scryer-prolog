@@ -329,7 +329,7 @@ expand_term_goals(Terms0, Terms) :-
                 )),
           Terms = (Head1 :- Body1)
        )
-    ;  Terms = Terms0
+    ;  Terms = Terms0 % sus, are they always unifiable?
     ).
 
 
