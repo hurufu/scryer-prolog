@@ -273,6 +273,19 @@ module_expanded_head_variables_([HeadArg | HeadArgs], [MetaSpec | MetaSpecs], He
     ;  module_expanded_head_variables_(HeadArgs, MetaSpecs, HeadVars, HeadVars0)
     ).
 
+%% module_expanded_head_variables(?Head, -HeadVars).
+%
+%  `Head` is an unqualified predicate head, `HeadVars` is a list of pairs,
+%  where first element of a pair is a free variable in second element is a
+%  computed number of missing arguments for it to become a complete goal
+%
+%  It handles situations like:
+%  ```
+%  ?- module_expanded_head_variables(maplist(maplist(G,_),_,_),V).
+%     V = [G-3].
+%  ```
+%  Which means that goal `G` is a partial goal that is missing 3 arguments.
+%
 module_expanded_head_variables(Head, HeadVars) :-
     (  var(Head) ->
        instantiation_error(load/1)
