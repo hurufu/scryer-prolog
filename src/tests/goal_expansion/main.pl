@@ -5,6 +5,7 @@
 :- use_module(library(lambda)).
 :- use_module(library(iso_ext)).
 :- use_module(library(lists)).
+:- use_module(library(pio)).
 :- use_module('../test_framework').
 :- use_module(m).
 
@@ -104,3 +105,36 @@ test("#1977 3", (
 test("#1987 1", (
     call_with_inference_limit(true,1,!)
 )).
+
+% https://github.com/mthom/scryer-prolog/issues/788
+test("#788 1", (
+   catch(clpz:neq_num(_,3), _, fail)
+)).
+
+test("#788 2", (
+   catch(call(clpz:neq_num(_,3)), _, fail)
+)).
+
+test("#788 3", (
+   catch(clpz:call(neq_num(_,3)), _, fail)
+)).
+
+test("#788 4", (
+   maplist(clpz:call, [neq_num(_,2)])
+)).
+
+test("#788 5", (
+   maplist(call, [clpz:neq_num(_,2)])
+)).
+
+test("#788 6", (
+   maplist(maplist(maplist(maplist(clpz:call))), [[[[neq_num(_,2)]]]])
+)).
+
+% https://github.com/mthom/scryer-prolog/issues/1565
+test("#1565 1", (
+   catch(phrase_to_stream(("hello","there"), user_error), _, fail)
+)).
+
+% https://github.com/mthom/scryer-prolog/issues/1568
+% TODO
