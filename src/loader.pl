@@ -873,7 +873,7 @@ expand_goal(UnexpandedGoals, Module, ExpandedGoals, HeadVars, TGs) :-
        ;  predicate_property(Module:Goals, meta_predicate(MetaSpecs0)),
           MetaSpecs0 =.. [_ | MetaSpecs] ->
           expand_module_names(Goals, MetaSpecs, Module, ExpandedGoals, HeadVars, TGs)
-       ;  thread_goals(Goals, ExpandedGoals, (','))
+       ;  thread_goals_2(Goals, ExpandedGoals)
        ;  Goals = ExpandedGoals
        )
     ).
@@ -946,16 +946,16 @@ expand_goal_cases((Module:Goals0), _, ExpandedGoals, HeadVars, TGs) :-
     expand_goal(Goals0, Module, Goals1, HeadVars, TGs),
     ExpandedGoals = (Module:Goals1).
 
-:- non_counted_backtracking thread_goals/3.
+:- non_counted_backtracking thread_goals_2/2.
 
-thread_goals(Goals0, Goals1, Functor) :-
+thread_goals_2(Goals0, Goals1) :-
     (  var(Goals0) ->
        Goals0 = Goals1
     ;  Goals0 = [G | Gs] ->
        (  Gs = [] ->
           Goals1 = G
-       ;  Goals1 =.. [Functor, G, Goals2],
-          thread_goals(Gs, Goals2, Functor)
+       ;  Goals1 = (G,Goals2),
+          thread_goals_2(Gs, Goals2)
        )
     ;  Goals1 = Goals0
     ).
