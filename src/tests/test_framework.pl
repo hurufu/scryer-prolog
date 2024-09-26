@@ -33,7 +33,7 @@ show_failed(Failed) :-
 run_tests([], []).
 run_tests([test(Name, Goal)|Tests], Failed) :-
     format("Running test \"~s\"~n", [Name]),
-    (   call(Goal) ->
+    (   catch(Goal, E, (writeq(E),nl,fail)) ->
         Failed = Failed1
     ;   format("Failed test \"~s\"~n", [Name]),
         Failed = [Name|Failed1]
