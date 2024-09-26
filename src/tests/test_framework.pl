@@ -5,6 +5,7 @@
 
 main(TestModule) :-
     findall(test(Name, TestModule:Goal), TestModule:test(Name, Goal), Tests),
+    nl,
     run_tests(Tests, Failed),
     show_failed(Failed),
     halt.
