@@ -50,6 +50,27 @@ pub fn prolog_benches() -> BTreeMap<&'static str, PrologBenchmark> {
             Strategy::Reuse,
             btreemap! {},
         ),
+        (
+            "direct_call",
+            "benches/call_expansion.pl",
+            "test(2^27,direct).",
+            Strategy::Reuse,
+            btreemap! {},
+        ),
+        (
+            "meta_call",
+            "benches/call_expansion.pl",
+            "test(2^27,call).",
+            Strategy::Reuse,
+            btreemap! {},
+        ),
+        (
+            "indirect_meta_call",
+            "benches/call_expansion.pl",
+            "test(2^27,icall).",
+            Strategy::Reuse,
+            btreemap! {},
+        ),
     ]
     .map(|b| {
         (

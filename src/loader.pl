@@ -273,6 +273,19 @@ module_expanded_head_variables_([HeadArg | HeadArgs], [MetaSpec | MetaSpecs], He
     ;  module_expanded_head_variables_(HeadArgs, MetaSpecs, HeadVars, HeadVars0)
     ).
 
+%% module_expanded_head_variables(?Head, -HeadVars).
+%
+%  `Head` is an unqualified predicate head, `HeadVars` is a list of pairs,
+%  where first element of a pair is a free variable in second element is a
+%  computed number of missing arguments for it to become a complete goal
+%
+%  It handles situations like:
+%  ```
+%  ?- module_expanded_head_variables(maplist(maplist(G,_),_,_),V).
+%     V = [G-3].
+%  ```
+%  Which means that goal `G` is a partial goal that is missing 3 arguments.
+%
 module_expanded_head_variables(Head, HeadVars) :-
     (  var(Head) ->
        instantiation_error(load/1)
@@ -316,7 +329,7 @@ expand_term_goals(Terms0, Terms) :-
                 )),
           Terms = (Head1 :- Body1)
        )
-    ;  Terms = Terms0
+    ;  Terms = Terms0 % sus, are they always unifiable?
     ).
 
 
@@ -860,7 +873,7 @@ expand_goal(UnexpandedGoals, Module, ExpandedGoals, HeadVars, TGs) :-
        ;  predicate_property(Module:Goals, meta_predicate(MetaSpecs0)),
           MetaSpecs0 =.. [_ | MetaSpecs] ->
           expand_module_names(Goals, MetaSpecs, Module, ExpandedGoals, HeadVars, TGs)
-       ;  thread_goals(Goals, ExpandedGoals, (','))
+       ;  thread_goals_2(Goals, ExpandedGoals)
        ;  Goals = ExpandedGoals
        )
     ).
@@ -933,16 +946,16 @@ expand_goal_cases((Module:Goals0), _, ExpandedGoals, HeadVars, TGs) :-
     expand_goal(Goals0, Module, Goals1, HeadVars, TGs),
     ExpandedGoals = (Module:Goals1).
 
-:- non_counted_backtracking thread_goals/3.
+:- non_counted_backtracking thread_goals_2/2.
 
-thread_goals(Goals0, Goals1, Functor) :-
+thread_goals_2(Goals0, Goals1) :-
     (  var(Goals0) ->
        Goals0 = Goals1
     ;  Goals0 = [G | Gs] ->
        (  Gs = [] ->
           Goals1 = G
-       ;  Goals1 =.. [Functor, G, Goals2],
-          thread_goals(Gs, Goals2, Functor)
+       ;  Goals1 = (G,Goals2),
+          thread_goals_2(Gs, Goals2)
        )
     ;  Goals1 = Goals0
     ).

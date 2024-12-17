@@ -16,6 +16,9 @@ mod iai {
     #[bench::memberbench_baseline(setup::prolog_benches()["memberbench_baseline"].setup())]
     #[bench::memberbench_if_expanded(setup::prolog_benches()["memberbench_if_expanded"].setup())]
     #[bench::memberbench_if_not_expanded(setup::prolog_benches()["memberbench_if_not_expanded"].setup())]
+    #[bench::direct_call(setup::prolog_benches()["direct_call"].setup())]
+    #[bench::indirect_call(setup::prolog_benches()["meta_call"].setup())]
+    #[bench::indirect_call(setup::prolog_benches()["indirect_meta_call"].setup())]
     fn bench(mut run: impl FnMut() -> QueryResolution) -> QueryResolution {
         run()
     }
