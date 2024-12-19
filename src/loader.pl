@@ -826,7 +826,7 @@ expand_meta_predicate_subgoals([SG | SGs], [MS | MSs], M, [ESG | ESGs], HeadVars
        expand_module_name(SG, MS, M, ESG)
     ;  '$is_expanded_or_inlined'(SG) ->
        ESG = SG
-    ;  /* false */ expand_subgoal(SG, MS, M, ESG, HeadVars, TGs) ->
+    ;  expand_subgoal(SG, MS, M, ESG, HeadVars, TGs) ->
        true
     ;  integer(MS),
        MS >= 0 ->
@@ -858,31 +858,25 @@ expand_goal(UnexpandedGoals, Module, ExpandedGoals) :-
           UnexpandedGoals = ExpandedGoals),
     !.
 
-:- non_counted_backtracking meta_predicate_spec/2.
-meta_predicate_spec(Goal, MetaSpecs) :-
-    predicate_property(Goal, meta_predicate(M)),
-    M =.. [_|MetaSpecs].
-
 :- non_counted_backtracking expand_goal/5.
 
 expand_goal(UnexpandedGoals, Module, ExpandedGoals, HeadVars, TGs) :-
-    writeq(Module:t(UnexpandedGoals, HeadVars, TGs)),write('.'),nl,
     (  var(UnexpandedGoals) ->
-       write(v), expand_module_names(call(UnexpandedGoals), [0], Module, ExpandedGoals, HeadVars, TGs)
+       expand_module_names(call(UnexpandedGoals), [0], Module, ExpandedGoals, HeadVars, TGs)
     ;  goal_expansion(UnexpandedGoals, Module, UnexpandedGoals1),
        (  Module \== user ->
           goal_expansion(UnexpandedGoals1, user, Goals)
        ;  Goals = UnexpandedGoals1
        ),
        (  expand_goal_cases(Goals, Module, ExpandedGoals, HeadVars, TGs) ->
-          write(o)
-      ;   meta_predicate_spec(Module:Goals, MetaSpecs) ->
-          expand_module_names(Goals, MetaSpecs, Module, ExpandedGoals, HeadVars, TGs), write(e)
-       ;  write(t), thread_goals_2(Goals, ExpandedGoals)
-       ;  Goals = ExpandedGoals, write(=)
+          true
+       ;  predicate_property(Module:Goals, meta_predicate(MetaSpecs0)),
+          MetaSpecs0 =.. [_ | MetaSpecs] ->
+          expand_module_names(Goals, MetaSpecs, Module, ExpandedGoals, HeadVars, TGs)
+       ;  thread_goals_2(Goals, ExpandedGoals)
+       ;  Goals = ExpandedGoals
        )
-    ),
-    nl,writeq(Module:a(ExpandedGoals)),write('.'),nl.
+    ).
 
 /*
  * private predicate for use in call/N. it doesn't specially consider
@@ -928,7 +922,6 @@ transitive_goal(G, TGs0, TGs1) :-
 
 :- non_counted_backtracking expand_goal_cases/5.
 
-expand_goal_cases(!, _, _, _, _) :- !, write(!), fail.
 expand_goal_cases((Goal0, Goals0), Module, ExpandedGoals, HeadVars, TGs) :-
     (  expand_goal(Goal0, Module, Goal1, HeadVars, TGs) ->
        transitive_goal(Goal0, TGs, TGs1),

@@ -24,7 +24,7 @@ fn cli_tests() {
         .skip("tests/scryer/cli/issues/*.toml")
         .skip("tests/scryer/cli/issues/singleton_warning.toml") // wrong line number
         .case("tests/scryer/cli/src_tests/reif_tests.toml")
-        .skip("tests/scryer/cli/src_tests/dcgs_tests.toml")
-        .skip("tests/scryer/cli/src_tests/goal_expansion_tests.toml")
+        .case("tests/scryer/cli/src_tests/dcgs_tests.toml")
+        .case("tests/scryer/cli/src_tests/goal_expansion_tests.toml")
         .skip("tests/scryer/cli/src_tests/*.md");
 }
