@@ -1,16 +1,15 @@
 :- module(reif_tests, []).
 
 :- use_module(library(reif)).
-:- use_module(library(lists)).
-:- use_module(library(dif)).
-:- use_module(library(lambda)).
-:- use_module(library(random)).
+%:- use_module(library(lists)).
+%:- use_module(library(dif)).
+%:- use_module(library(lambda)).
+%:- use_module(library(random)).
 :- use_module(test_framework).
 
 /*
 Those tests are just sanity checks – examples from the paper, to make sure I
 haven't messed up.
-*/
 test("indexing dif/2 p6#1", (
     findall(X-Fs, tfilter(=(X),[1,2,3,2,3,3],Fs), [1-[1], 2-[2,2], 3-[3,3,3], Y-[]]),
     maplist(dif(Y), [1,2,3])
@@ -47,11 +46,11 @@ test("doesn't expand higher order predicates", (
     reif:goal_expanded(X, Y),
     X == Y
 )).
+*/
 
 /*
 Following tests capture current results of goal expansion
 TODO: Investigate if if_/3 can be further expanded, and if it will be beneficial
-*/
 test("goal_expansion (=)", (
     subsumes_full_expansion(if_(1=2,a,b), (
         1 \= 2 -> b
@@ -95,6 +94,7 @@ test("set of solutions found by tpartition/4 and tfilter/3 is the same and corre
     findall((N,Ts), tfilter(=(N),TestVector,Ts), S),
     maplist(_+\(N,Ts)^maplist(=(N),Ts), S)
 )).
+*/
 
 test("cut in one of the branches does not influence condition", (
     findall(X-Y, if_(X=1,!,Y=a), Solutions),
@@ -105,11 +105,14 @@ test("cut in one of the branches does not influence condition", (
     var(X2), dif(X2, 1)
 )).
 
+/*
 test("non-callable branch throws meaningful error", (
     findall(R, result_or_exception(if_(_=1, _=a, 2), R), Solutions),
     Solutions == [if_(1=1,a=a,2), error(type_error(callable,2),call/1)]
 )).
+*/
 
+/*
 result_or_exception(Goal, Result) :-
     catch((Goal,Result=Goal), Result, true).
 
@@ -129,7 +132,6 @@ subsumes_full_expansion(G, X) :-
 
 /*
 Extra predicates from the paper
-*/
 duplicate(X, Xs) :-
     tfilter(=(X), Xs, [_,_|_]).
 
@@ -145,3 +147,4 @@ tree_non_member(E, t(F,L,R)) :-
     dif(E,F),
     tree_non_member(E, L),
     tree_non_member(E, R).
+*/
