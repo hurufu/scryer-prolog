@@ -14,18 +14,18 @@ main_quiet(TestModule) :-
     findall(test(Name, TestModule:Goal), TestModule:test(Name, Goal), Tests),
     run_tests_quiet(Tests, Failed),
     (   Failed = [] ->
-        format("All tests passed", [])
-    ;   format("Some tests failed", [])
+        format("% All tests passed", [])
+    ;   format("% Some tests failed", [])
     ),
     halt.
 
 portray_failed_([]) --> [].
 portray_failed_([F|Fs]) -->
-    "\"", F, "\"",  "\n", portray_failed_(Fs).
+    "% \"", F, "\"",  "\n", portray_failed_(Fs).
 
 portray_failed([]) --> [].
 portray_failed([F|Fs]) -->
-    "\n", "Failed tests:", "\n", portray_failed_([F|Fs]).
+    "\n", "% Failed tests:", "\n", portray_failed_([F|Fs]).
 
 show_failed(Failed) :-
     phrase(portray_failed(Failed), F),
@@ -33,10 +33,10 @@ show_failed(Failed) :-
 
 run_tests([], []).
 run_tests([test(Name, Goal)|Tests], Failed) :-
-    format("Running test \"~s\"~n", [Name]),
+    format("% Running test \"~s\"~n", [Name]),
     (   catch(Goal, E, (writeq(E),nl,fail)) ->
         Failed = Failed1
-    ;   format("Failed test \"~s\"~n", [Name]),
+    ;   format("% Failed test \"~s\"~n", [Name]),
         Failed = [Name|Failed1]
     ),
     run_tests(Tests, Failed1).

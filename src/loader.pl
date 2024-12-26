@@ -70,11 +70,37 @@ term_expansion_list([Term|Terms], ExpandedTermsHead, ExpandedTermsTail) :-
     ).
 
 
+debug(off).
+w(Tag, Term) :-
+    debug(on) ->
+        write((db(Tag) :- '')),
+        writeq(Term),
+        write(.),
+        nl
+    ;   true.
+
+% If Goal is a meta-predicate
+% and if its meta-arguments contain evaulable cuts
+% Then don't call goal_expansion on that goal
+no_meta_call_of_cut(Module, Goal) :-
+    predicate_property(Goal, meta_predicate(MetaSpec)),
+    Goal = if_(_,_,_),
+    !,
+    w((=), Module:Goal/MetaSpec),
+    (   user:goal_expansion(Goal, XGoal) ->
+            w(x, XGoal)
+        ;   write('% didnt expand\n')
+    ),
+    false.
+no_meta_call_of_cut(_, _).
+
+
 :- non_counted_backtracking goal_expansion/3.
 
 goal_expansion(Goal, Module, ExpandedGoal) :-
     (  atom(Module),
        '$predicate_defined'(Module, goal_expansion, 2),
+       no_meta_call_of_cut(Module, Goal),
        catch('$call'(Module:goal_expansion(Goal, ExpandedGoal0)),
              E,
              loader:'$print_message_and_fail'(E)) ->
@@ -736,6 +762,7 @@ subgoal_expansion(Goal, Module, ExpandedGoal) :-
     '$get_cp'(B),
     (  atom(Module),
        '$predicate_defined'(Module, goal_expansion, 2),
+       no_meta_call_of_cut(Module, Goal),
        catch('$call'(Module:goal_expansion(Goal, ExpandedGoal0)),
              _E,
              '$call'(loader:subgoal_expansion_fail(B))

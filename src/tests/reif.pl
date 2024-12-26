@@ -96,6 +96,16 @@ test("set of solutions found by tpartition/4 and tfilter/3 is the same and corre
     maplist(_+\(N,Ts)^maplist(=(N),Ts), S)
 )).
 
+test("cut doesnt cut 1", (
+    if_(X=2, !, Y=a)
+)).
+
+test("cut doesnt cut 2", (
+    if_(X=2, !, Y=a),
+    Y == a,
+    dif(X,2)
+)).
+
 test("cut in one of the branches does not influence condition", (
     findall(X-Y, if_(X=1,!,Y=a), Solutions),
     Expected = [1-Y1,X2-a],
