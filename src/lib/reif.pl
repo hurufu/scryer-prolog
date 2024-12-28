@@ -92,10 +92,18 @@ sameargs(0, _, _).
 
 
 /*
-  no !s that cut outside.
   no variables in place of goals
   no malformed goals like integers
 */
+
+
+has_callable_cut(!).
+has_callable_cut((A,B)) :- has_callable_cut(A, B).
+has_callable_cut((A;B)) :- has_callable_cut(A, B).
+has_callable_cut((A->B)) :- has_callable_cut(A, B).
+has_callable_cut(\+A) :- has_callable_cut(A).
+has_callable_cut(A, _) :- has_callable_cut(A).
+has_callable_cut(_, B) :- has_callable_cut(B).
 
 
 /* 2do: unqualified If_1: error
@@ -103,7 +111,11 @@ sameargs(0, _, _).
 
 %
 user:goal_expansion(if_(If_1, Then_0, Else_0), G_0) :-
-   ugoal_expansion(if_(If_1, Then_0, Else_0), G_0).
+   (\+ \+ has_callable_cut(Then_0) ->
+      SanitizedThen_0 = call(Then_0),
+   ;  SanitizedThen_0 = Then_0,
+   ),
+   ugoal_expansion(if_(If_1, SanitizedThen_0, Else_0), G_0).
 
 %
 %
