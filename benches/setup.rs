@@ -8,6 +8,7 @@ use scryer_prolog::machine::{
 
 pub fn prolog_benches() -> BTreeMap<&'static str, PrologBenchmark> {
     [
+        /*
         (
             "count_edges",                       // name of the benchmark
             "benches/edges.pl", // name of the prolog module file to load. use the same file in multiple benchmarks
@@ -29,6 +30,7 @@ pub fn prolog_benches() -> BTreeMap<&'static str, PrologBenchmark> {
             Strategy::Reuse,
             btreemap! { "Name" => Value::String("SPACE".into())},
         ),
+        */
         (
             "memberbench_baseline",
             "benches/reif.pl",
@@ -50,6 +52,7 @@ pub fn prolog_benches() -> BTreeMap<&'static str, PrologBenchmark> {
             Strategy::Reuse,
             btreemap! {},
         ),
+        /*
         (
             "direct_call",
             "benches/call_expansion.pl",
@@ -71,6 +74,7 @@ pub fn prolog_benches() -> BTreeMap<&'static str, PrologBenchmark> {
             Strategy::Reuse,
             btreemap! {},
         ),
+        */
     ]
     .map(|b| {
         (

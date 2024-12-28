@@ -24,6 +24,7 @@ fn bench_criterion(c: &mut Criterion) {
 fn config() -> Criterion {
     Criterion::default()
         .sample_size(20)
+        .measurement_time(std::time::Duration::from_secs(200))
         .with_profiler(PProfProfiler::new(100, Output::Flamegraph(None)))
 }
 
