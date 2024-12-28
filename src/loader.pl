@@ -70,7 +70,7 @@ term_expansion_list([Term|Terms], ExpandedTermsHead, ExpandedTermsTail) :-
     ).
 
 
-debug(off).
+debug(on).
 w(Tag, Term) :-
     debug(on) ->
         write((db(Tag) :- '')),
@@ -79,14 +79,19 @@ w(Tag, Term) :-
         nl
     ;   true.
 
+
+walk_cut(T) :- nonvar(T), (T == ! -> true; T =.. [_|A], maplist(walk_cut, A)).
+
 % If Goal is a meta-predicate
 % and if its meta-arguments contain evaulable cuts
 % Then don't call goal_expansion on that goal
 no_meta_call_of_cut(Module, Goal) :-
     predicate_property(Goal, meta_predicate(MetaSpec)),
     Goal = if_(_,_,_),
+    w(0, Goal),
+    walk_cut(Goal),
     !,
-    w((=), Module:Goal/MetaSpec),
+    w(!, Module:Goal/MetaSpec),
     (   user:goal_expansion(Goal, XGoal) ->
             w(x, XGoal)
         ;   write('% didnt expand\n')
@@ -100,7 +105,7 @@ no_meta_call_of_cut(_, _).
 goal_expansion(Goal, Module, ExpandedGoal) :-
     (  atom(Module),
        '$predicate_defined'(Module, goal_expansion, 2),
-       no_meta_call_of_cut(Module, Goal),
+       %no_meta_call_of_cut(Module, Goal),
        catch('$call'(Module:goal_expansion(Goal, ExpandedGoal0)),
              E,
              loader:'$print_message_and_fail'(E)) ->
@@ -269,6 +274,11 @@ complete_partial_goal(N, HeadArg, InnerHeadArgs, SuppArgs, CompleteHeadArg) :-
     ;  type_error(callable, Functor, _)
     ).
 
+%% inner_meta_specs(+MetaSpec, ?Callable, -InnerHeadArgs, -InnerMetaSpecs).
+%
+% Given meta-predicate indicator `MetaSpec` for `Callable`,
+% `InnerHeadArgs` is a list of its arguments and InnerMetaSpecs is meta-predicate
+% indicators of them
 inner_meta_specs(0, HeadArg, InnerHeadArgs, InnerMetaSpecs) :-
     !,
     predicate_property(HeadArg, meta_predicate(InnerMetaSpecs0)),
@@ -282,6 +292,8 @@ inner_meta_specs(N, HeadArg, InnerHeadArgs, InnerMetaSpecs) :-
     InnerMetaSpecs0 =.. [_ | InnerMetaSpecs].
 
 
+%% module_expanded_head_variables_(?HeadArgs, +MetaSpecs, -HeadVars, +Acc).
+%
 module_expanded_head_variables_([], _, HeadVars, HeadVars).
 module_expanded_head_variables_([HeadArg | HeadArgs], [MetaSpec | MetaSpecs], HeadVars, HeadVars0) :-
     (  (  MetaSpec == (:)
@@ -762,7 +774,7 @@ subgoal_expansion(Goal, Module, ExpandedGoal) :-
     '$get_cp'(B),
     (  atom(Module),
        '$predicate_defined'(Module, goal_expansion, 2),
-       no_meta_call_of_cut(Module, Goal),
+       %no_meta_call_of_cut(Module, Goal),
        catch('$call'(Module:goal_expansion(Goal, ExpandedGoal0)),
              _E,
              '$call'(loader:subgoal_expansion_fail(B))

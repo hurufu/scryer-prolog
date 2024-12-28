@@ -106,6 +106,10 @@ test("cut doesnt cut 2", (
     dif(X,2)
 )).
 
+test("cut", (
+    if_(X=1, if_(Y=2, !, Y=a), if(Z=3, Y=b, !))
+)).
+
 test("cut in one of the branches does not influence condition", (
     findall(X-Y, if_(X=1,!,Y=a), Solutions),
     Expected = [1-Y1,X2-a],
