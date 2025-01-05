@@ -1,0 +1,7 @@
+args = [
+    "-f",
+    "--no-add-history",
+    "src/tests/inline_tests.pl",
+    "-g", "run",
+    "-g", "halt"
+]
