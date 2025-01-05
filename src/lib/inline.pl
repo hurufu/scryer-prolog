@@ -9,6 +9,7 @@
 ]).
 
 :- use_module(library(lists), [maplist/3]).
+:- use_module(library(debug)).
 
 :- dynamic(inline_db/2).
 :- multifile(inline_db/2).
@@ -18,9 +19,10 @@
 :- multifile(inline_goal/1).
 :- discontiguous(inline_goal/1).
 
-mode(+, V) :- ground(V).
-mode(-, V) :- var(V).
-mode(?, V) :- nonvar(V).
+mode(+, V) :- ground(V), !.
+mode(-, V) :- var(V), !.
+mode(?, _) :- !.
+mode(0, V) :- $goal_sanitized(V, V).
 
 inline_spec(Head, Spec) :-
     functor(Head, F, N),
